@@ -31,7 +31,6 @@ let isHandDetected = false;
 let isCakeLit = false;
 let isCandlesBlownOut = false;
 
-// Audio detection variables
 let audioContext = null;
 let analyser = null;
 let microphone = null;
@@ -49,7 +48,6 @@ hands.setOptions({
   minTrackingConfidence: isMobile ? 0.4 : 0.5,
 });
 
-// Hand tracking results
 hands.onResults((results) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -62,7 +60,6 @@ hands.onResults((results) => {
     const landmarks = results.multiHandLandmarks[0];
     isHandDetected = true;
 
-    // Get index finger tip (landmark 8)
     const indexTip = landmarks[8];
 
     handPosition.x = 1 - indexTip.x;
@@ -81,11 +78,11 @@ function updateMatchPosition() {
   const windowHeight = window.innerHeight;
   const matchX = handPosition.x * windowWidth;
   const matchY = handPosition.y * windowHeight;
-  const matchWidth = match.offsetWidth || 80; // Ширина спички
+  const matchWidth = match.offsetWidth || 80; 
   const matchHeight = match.offsetHeight || 120; 
   
   match.style.left = `${matchX - matchWidth/2}px`;
-  match.style.top = `${matchY - matchHeight}px`; // Поднимаем, чтобы кончик был у пальца
+  match.style.top = `${matchY - matchHeight}px`; 
 }
 function checkCandleLighting() {
   if (isCakeLit || isCandlesBlownOut) return;
@@ -94,23 +91,20 @@ function checkCandleLighting() {
   const cakeRect = cakeImg.getBoundingClientRect();
   const matchTipX = matchRect.left + matchRect.width / 2;
   const matchTipY = matchRect.top;
-
-  // Центр свечей на торте (примерно 40% от верха торта)
   const candleX = cakeRect.left + cakeRect.width / 2;
-  const candleY = cakeRect.top + (cakeRect.height * 0.4); // 40% от высоты торта
+  const candleY = cakeRect.top + (cakeRect.height * 0.4); 
 
   const distance = Math.sqrt(
     Math.pow(matchTipX - candleX, 2) + Math.pow(matchTipY - candleY, 2)
   );
 
-  console.log(`Distance to candle: ${distance}px`); // Для отладки
+  console.log(`Distance to candle: ${distance}px`); 
 
   if (distance < LIGHT_DISTANCE) {
     lightCake();
   }
 }
 
-// Light the cake
 function lightCake() {
   if (isCakeLit) return;
 
@@ -118,24 +112,20 @@ function lightCake() {
   cakeImg.src = "cake_lit.gif";
   match.style.display = "none";
   
-  // Start blow detection when cake is lit
   if (!isBlowDetectionActive) {
     initBlowDetection();
   }
 }
 
-// Blow out candles
 function blowOutCandles() {
   if (!isCakeLit || isCandlesBlownOut) return;
 
   isCandlesBlownOut = true;
   cakeImg.src = "cake_unlit.gif";
   
-  // Show celebration message
   showCelebrationMessage();
 }
 
-// Show celebration message after blowing out candles
 function showCelebrationMessage() {
   const message = document.createElement('div');
   message.innerHTML = `
@@ -197,14 +187,12 @@ async function initBlowDetection() {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioContext.createAnalyser();
     
-    // Используем аудио дорожку из потока камеры
     const audioTrack = cameraStream.getAudioTracks()[0];
     if (!audioTrack) {
       console.log("No audio track available");
       return;
     }
     
-    // Создаем новый поток только с аудио
     const audioStream = new MediaStream([audioTrack]);
     microphone = audioContext.createMediaStreamSource(audioStream);
 
@@ -340,32 +328,23 @@ Yesbutton.addEventListener('click', function(){
 letteryesbtn.addEventListener('click',function(){
     letterblock.style.display='none';
     openlet.style.display='block';
-    
-    // Center the letter
     openlet.style.position = 'fixed';
     openlet.style.left = '50%';
     openlet.style.top = '50%';
     openlet.style.transform = 'translate(-50%, -50%)';
     openlet.style.zIndex = '1500';
     
-    // Add animation
     openlet.style.animation = 'openLetter 0.8s forwards';
-    
-    // After animation, show congratulations
     setTimeout(() => {
         showCongratulations();
     }, 1500); 
 });
 
 function showCongratulations() {
-    // Hide the open letter
     openlet.style.display = 'none';
     
-    // Show congratulations
     congratulationsDiv.style.display = 'flex';
     congratulationsDiv.style.animation = 'fadeInUp 0.8s ease-out';
-    
-    // Scroll to top
     const congratsContent = document.querySelector('.congrats-content');
     if (congratsContent) {
         congratsContent.scrollTop = 0;
